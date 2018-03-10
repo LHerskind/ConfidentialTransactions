@@ -3,10 +3,15 @@ package Lasse_Herskind;
 import Lasse_Herskind.SingleKnowledgeProof.KnowledgeProof;
 import Lasse_Herskind.SingleKnowledgeProof.KnowledgeProofProver;
 import Lasse_Herskind.SingleKnowledgeProof.KnowledgeProofVerifier;
+import Lasse_Herskind.TransactionBalancesKnowledgeProof.TransactionProof;
+import Lasse_Herskind.TransactionBalancesKnowledgeProof.TransactionProofVerifier;
+import cyclops.collections.immutable.VectorX;
 import edu.stanford.cs.crypto.efficientct.GeneratorParams;
+import edu.stanford.cs.crypto.efficientct.Proof;
 import edu.stanford.cs.crypto.efficientct.VerificationFailedException;
 import edu.stanford.cs.crypto.efficientct.circuit.groups.BN128Group;
 import edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint;
+import edu.stanford.cs.crypto.efficientct.circuit.groups.Group;
 import edu.stanford.cs.crypto.efficientct.circuit.groups.GroupElement;
 import edu.stanford.cs.crypto.efficientct.commitments.PeddersenCommitment;
 import edu.stanford.cs.crypto.efficientct.rangeproof.RangeProof;
@@ -15,6 +20,7 @@ import edu.stanford.cs.crypto.efficientct.rangeproof.RangeProofVerifier;
 import edu.stanford.cs.crypto.efficientct.util.ProofUtils;
 
 import java.math.BigInteger;
+import java.util.Vector;
 
 public class Main_Testing {
 
@@ -48,18 +54,21 @@ public class Main_Testing {
         KnowledgeProof knowledgeProofAfter = new KnowledgeProofProver().generateProof(parameters, commitmentAfter, new PeddersenCommitment(parameters.getBase(), balanceBefore.add(amountToSend), lambda.add(lambda2)));
 
 
-        new KnowledgeProofVerifier().verify(parameters, commitmentBefore, knowledgeProofBefore);
-        new KnowledgeProofVerifier().verify(parameters, commitmentAmount, knowledgeProofAmount);
-        new KnowledgeProofVerifier().verify(parameters, commitmentAfter, knowledgeProofAfter);
-
-
-
-
         GroupElement v = parameters.getBase().commit(balanceAfter, lambda);
         PeddersenCommitment<BouncyCastleECPoint> witness = new PeddersenCommitment(parameters.getBase(), balanceAfter, lambda);
         RangeProof proof = new RangeProofProver().generateProof(parameters, v, witness);
-        RangeProofVerifier verifier = new RangeProofVerifier();
-        verifier.verify(parameters, v, proof);
+
+        VectorX<GroupElement> commitments = VectorX.of(commitmentBefore, commitmentAmount, commitmentAfter, v);
+        VectorX<Proof> proofs = VectorX.of(knowledgeProofBefore, knowledgeProofAmount, knowledgeProofAfter, proof);
+
+        new TransactionProofVerifier().verify(parameters, commitments, proofs);
+
+/*
+        new KnowledgeProofVerifier().verify(parameters, commitmentBefore, knowledgeProofBefore);
+        new KnowledgeProofVerifier().verify(parameters, commitmentAmount, knowledgeProofAmount);
+        new KnowledgeProofVerifier().verify(parameters, commitmentAfter, knowledgeProofAfter);
+        new RangeProofVerifier().verify(parameters, v, proof);
+        */
     }
 
 
