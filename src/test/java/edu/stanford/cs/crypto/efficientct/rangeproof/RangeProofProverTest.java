@@ -22,21 +22,22 @@ import java.util.Arrays;
 public class RangeProofProverTest<T extends GroupElement<T>> {
     @Parameterized.Parameters
     public static Object[] data() {
-        return new Object[] { new Secp256k1(),new BN128Group()};
+        return new Object[]{new Secp256k1(), new BN128Group()};
     }
+
     @Parameterized.Parameter
     public Group<?> curve;
 
     @Test
     public void testCompletness() throws VerificationFailedException {
-        BigInteger number = BigInteger.valueOf(5);
+        BigInteger number = BigInteger.valueOf(15);
         BigInteger randomness = ProofUtils.randomNumber();
 
-        GeneratorParams parameters = GeneratorParams.generateParams(256,curve);
+        GeneratorParams parameters = GeneratorParams.generateParams(4, curve);
         GroupElement v = parameters.getBase().commit(number, randomness);
-        PeddersenCommitment<BouncyCastleECPoint> witness = new PeddersenCommitment(parameters.getBase(),number, randomness);
-        BouncyCastleECPoint.addCount=0;
-        BouncyCastleECPoint.expCount=0;
+        PeddersenCommitment<BouncyCastleECPoint> witness = new PeddersenCommitment(parameters.getBase(), number, randomness);
+        BouncyCastleECPoint.addCount = 0;
+        BouncyCastleECPoint.expCount = 0;
         RangeProof proof = new RangeProofProver().generateProof(parameters, v, witness);
         System.out.println(BouncyCastleECPoint.expCount);
         System.out.println(BouncyCastleECPoint.addCount);
@@ -44,14 +45,15 @@ public class RangeProofProverTest<T extends GroupElement<T>> {
         verifier.verify(parameters, v, proof);
 
     }
+
     @Test
     public void testCompletness2() throws VerificationFailedException {
         BigInteger number = BigInteger.valueOf(100);
         BigInteger randomness = ProofUtils.randomNumber();
 
-        GeneratorParams parameters = GeneratorParams.generateParams(256,curve);
+        GeneratorParams parameters = GeneratorParams.generateParams(256, curve);
         GroupElement v = parameters.getBase().commit(number, randomness);
-        PeddersenCommitment witness = new PeddersenCommitment(parameters.getBase(),number, randomness);
+        PeddersenCommitment witness = new PeddersenCommitment(parameters.getBase(), number, randomness);
         RangeProof proof = new RangeProofProver().generateProof(parameters, v, witness);
         RangeProofVerifier verifier = new RangeProofVerifier();
         verifier.verify(parameters, v, proof);
@@ -62,9 +64,9 @@ public class RangeProofProverTest<T extends GroupElement<T>> {
         BigInteger number = BigInteger.valueOf(70000);
         BigInteger randomness = ProofUtils.randomNumber();
 
-        GeneratorParams parameters = GeneratorParams.generateParams(16,curve);
+        GeneratorParams parameters = GeneratorParams.generateParams(16, curve);
         GroupElement v = parameters.getBase().commit(number, randomness);
-        PeddersenCommitment witness = new PeddersenCommitment(parameters.getBase(),number, randomness);
+        PeddersenCommitment witness = new PeddersenCommitment(parameters.getBase(), number, randomness);
         RangeProof proof = new RangeProofProver().generateProof(parameters, v, witness);
         RangeProofVerifier verifier = new RangeProofVerifier();
         verifier.verify(parameters, v, proof);

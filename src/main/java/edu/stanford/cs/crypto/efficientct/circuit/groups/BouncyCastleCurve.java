@@ -15,7 +15,6 @@ public abstract class BouncyCastleCurve implements Group<BouncyCastleECPoint> {
     }
 
 
-
     @Override
     public BouncyCastleECPoint generator() {
         return generator;

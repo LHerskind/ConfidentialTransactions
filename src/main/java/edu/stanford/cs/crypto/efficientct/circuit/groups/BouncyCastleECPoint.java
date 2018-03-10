@@ -4,7 +4,7 @@ import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
 
-public class BouncyCastleECPoint implements GroupElement<BouncyCastleECPoint> {
+public class BouncyCastleECPoint implements GroupElement<edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint> {
     public static int expCount=0;
     public static int addCount=0;
     private final ECPoint point;
@@ -14,19 +14,19 @@ public class BouncyCastleECPoint implements GroupElement<BouncyCastleECPoint> {
     }
 
     @Override
-    public BouncyCastleECPoint add(BouncyCastleECPoint other) {
+    public edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint add(edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint other) {
         ++addCount;
         return from(point.add(other.point));
     }
 
     @Override
-    public BouncyCastleECPoint multiply(BigInteger exp) {
+    public edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint multiply(BigInteger exp) {
         ++expCount;
         return from(point.multiply(exp));
     }
 
     @Override
-    public BouncyCastleECPoint negate() {
+    public edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint negate() {
         return from(point.negate());
     }
 
@@ -40,8 +40,8 @@ public class BouncyCastleECPoint implements GroupElement<BouncyCastleECPoint> {
         return point.normalize().toString();
     }
 
-    private static  BouncyCastleECPoint from(ECPoint point) {
-        return new BouncyCastleECPoint(point);
+    private static edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint from(ECPoint point) {
+        return new edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint(point);
     }
 
     public ECPoint getPoint() {
@@ -58,7 +58,7 @@ public class BouncyCastleECPoint implements GroupElement<BouncyCastleECPoint> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BouncyCastleECPoint that = (BouncyCastleECPoint) o;
+        edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint that = (edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint) o;
 
         return point != null ? point.equals(that.point) : that.point == null;
     }

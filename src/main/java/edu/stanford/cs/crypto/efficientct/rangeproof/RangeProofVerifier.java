@@ -66,6 +66,5 @@ public class RangeProofVerifier<T extends GroupElement<T>> implements Verifier<G
         // System.out.println("uVerify" +u);
         EfficientInnerProductVerifier<T> verifier = new EfficientInnerProductVerifier<>();
         verifier.verify(primeBase, P, proof.getProductProof());
-
     }
 }
