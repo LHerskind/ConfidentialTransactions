@@ -22,31 +22,34 @@ public class Main_Testing {
     public static void main(String[] args) throws VerificationFailedException {
         BN128Group curve = new BN128Group();
 
-        BigInteger maxValue = BigInteger.valueOf(16);
+        BigInteger maxValue = BigInteger.valueOf(64);
         int goalLength = maxValue.bitLength();
         int length = 1;
         do {
             length *= 2;
         } while (length < goalLength);
         GeneratorParams parameters = GeneratorParams.generateParams(length, curve);
+        System.out.println("PedersenBaseG: " + parameters.getBase().g);
+        System.out.println("PedersenBaseh: " + parameters.getBase().h);
+
         BigInteger lambda = ProofUtils.randomNumber();
         BigInteger lambda2 = ProofUtils.randomNumber();
 
         // Nogle af de vigtige ting
         BigInteger balanceBefore = BigInteger.valueOf(15);
-        BigInteger amountToSend = BigInteger.valueOf(-2);
+        BigInteger amountToSend = BigInteger.valueOf(2);
         BigInteger balanceAfter = balanceBefore.add(amountToSend);
 
         GroupElement commitmentBefore = parameters.getBase().commit(balanceBefore, lambda);
         GroupElement commitmentAmount = parameters.getBase().commit(amountToSend, lambda2);
 
-        GroupElement commitmentAfter = commitmentBefore.add(commitmentAmount);
+        GroupElement commitmentAfter = commitmentBefore.subtract(commitmentAmount);
 
         KnowledgeProofProver prover = new KnowledgeProofProver();
 
         KnowledgeProof knowledgeProofBefore = prover.generateProof(parameters, commitmentBefore, new PeddersenCommitment(parameters.getBase(), balanceBefore, lambda));
         KnowledgeProof knowledgeProofAmount = prover.generateProof(parameters, commitmentAmount, new PeddersenCommitment(parameters.getBase(), amountToSend, lambda2));
-        KnowledgeProof knowledgeProofAfter = new KnowledgeProofProver().generateProof(parameters, commitmentAfter, new PeddersenCommitment(parameters.getBase(), balanceBefore.add(amountToSend), lambda.add(lambda2)));
+        KnowledgeProof knowledgeProofAfter = prover.generateProof(parameters, commitmentAfter, new PeddersenCommitment(parameters.getBase(), balanceBefore.subtract(amountToSend), lambda.subtract(lambda2)));
 
 
         GroupElement v = parameters.getBase().commit(balanceAfter, lambda);
@@ -71,13 +74,6 @@ public class Main_Testing {
         System.out.println(proof.getProductProof().getB());
         System.out.println(proof.getProductProof().getL());
         System.out.println(proof.getProductProof().getR());
-
-/*
-        new KnowledgeProofVerifier().verify(parameters, commitmentBefore, knowledgeProofBefore);
-        new KnowledgeProofVerifier().verify(parameters, commitmentAmount, knowledgeProofAmount);
-        new KnowledgeProofVerifier().verify(parameters, commitmentAfter, knowledgeProofAfter);
-        new RangeProofVerifier().verify(parameters, v, proof);
-  */
     }
 
 

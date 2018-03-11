@@ -1,6 +1,4 @@
-package edu.stanford.cs.crypto.efficientct.util;/*
- * Decompiled with CFR 0_110.
- */
+package edu.stanford.cs.crypto.efficientct.util;
 
 import edu.stanford.cs.crypto.efficientct.circuit.groups.BouncyCastleECPoint;
 import edu.stanford.cs.crypto.efficientct.circuit.groups.GroupElement;
@@ -48,10 +46,11 @@ public class ProofUtils {
         return new BigInteger(hash).mod(q);
     }
 
+    // TODO: Her er ændret lidt, der var noget i forhold til længde på det lort.
     public static BigInteger challengeFromints(BigInteger q, BigInteger... ints){
         StringBuilder x = new StringBuilder();
         for (BigInteger anInt : ints) {
-            x.append(encode(new Uint256(anInt)));
+            x.append(encode(new Uint256(anInt.mod(new BigInteger("2").pow(256)))));
         }
         return new BigInteger(1, hexStringToByteArray(sha3(x.toString()))).mod(q);
     }
