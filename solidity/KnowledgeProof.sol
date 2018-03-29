@@ -28,10 +28,7 @@ contract KnowledgeProofVerifier {
         return verifyInternal(commitment, knowledgeProof);
     }
 
-    function verifyInternal(
-        alt_bn128.G1Point input,
-        KnowledgeProof proof
-    ) internal view returns (bool) {
+    function verifyInternal(alt_bn128.G1Point input, KnowledgeProof proof) internal view returns (bool) {
         require(input.eq(proof.A));
         uint256 challenge = uint256(keccak256(input.X, input.Y, proof.T.X, proof.T.Y)).mod();
         alt_bn128.G1Point memory verificationPoint = proof.A.mul(challenge).add(proof.T);
