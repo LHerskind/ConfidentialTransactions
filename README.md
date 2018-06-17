@@ -72,7 +72,5 @@ This is again just the arguments needed for the methods. Running the *minting* w
 bulletCoin.mint(<address_of_user_1>, "0x22f0d6ec48adf22874a831a34703b8cc37b90a8f0de7ad79bc53b45c0cf12fcb","0x2edb129868ec0833acbcf522e6528f826228265a4bad09f9965900271296ded5",{from:<owner_of_coin>});
 ```
 
-## References:
-[1] : https://crypto.stanford.edu/bulletproofs/
-
-[2] : https://github.com/BANKEX/ETHDenver_ConfidentialTransactions
+[1]: https://crypto.stanford.edu/bulletproofs/
+[2]: https://github.com/BANKEX/ETHDenver_ConfidentialTransactions
