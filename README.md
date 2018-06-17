@@ -1,7 +1,7 @@
 
 # Confidential transfers on Ethereum - the *bulletcoin*
 
-This repository is the implementation of publicly verifiable confidential transfers on the Ethereum blockchain, as proposed in the BitFlow Paper.
+This repository is the implementation of publicly verifiable confidential transfers on the Ethereum blockchain, as proposed in the BitFlow Paper[3].
 
 The implementation builds on the foundation provided by BANKEX[2] and extends further upon the *"transfer protocol"*.
 
@@ -71,3 +71,4 @@ bulletCoin.mint(<address_of_user_1>, "0x22f0d6ec48adf22874a831a34703b8cc37b90a8f
 
 [1]: https://crypto.stanford.edu/bulletproofs/
 [2]: https://github.com/BANKEX/ETHDenver_ConfidentialTransactions
+[3]: https://findit.dtu.dk/en/catalog/2434703292 
