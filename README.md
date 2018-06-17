@@ -3,7 +3,9 @@
 
 This repository is the implementation of publicly verifiable confidential transfers on the Ethereum blockchain, as proposed in the BitFlow Paper.
 
-The implementation builds upon homomorphic commitments: 
+The implementation builds on the foundation provided by BANKEX[2] and extends further upon the *"transfer protocol"*.
+
+The implementation heavily depends upon homomorphic commitments: 
 ```
 commitment(a+b, lambda_1+lambda_2) = commitment(a, lambda_1) + commitment(b, lambda_2)
 ```
@@ -71,4 +73,6 @@ bulletCoin.mint(<address_of_user_1>, "0x22f0d6ec48adf22874a831a34703b8cc37b90a8f
 ```
 
 ## References:
-[1]: https://crypto.stanford.edu/bulletproofs/
+[1] : https://crypto.stanford.edu/bulletproofs/
+
+[2] : https://github.com/BANKEX/ETHDenver_ConfidentialTransactions
