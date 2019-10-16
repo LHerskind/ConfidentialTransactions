@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.aol.simplereact:cyclops-react:2.0.0-FINAL">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/aol/simplereact/cyclops-react/2.0.0-FINAL/cyclops-react-2.0.0-FINAL.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/aol/simplereact/cyclops-react/2.0.0-FINAL/cyclops-react-2.0.0-FINAL-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/aol/simplereact/cyclops-react/2.0.0-FINAL/cyclops-react-2.0.0-FINAL-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

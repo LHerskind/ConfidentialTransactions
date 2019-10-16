@@ -20,7 +20,6 @@ public class PolyCommitment<T extends GroupElement<T>> {
 
 
     public PeddersenCommitment<T> evaluate(BigInteger x) {
-
         return VectorX.iterate(coefficientCommitments.size(), BigInteger.ONE, x::multiply).zip(coefficientCommitments, (xi, ci) -> ci.times(xi)).reduce(PeddersenCommitment::add).get();
     }
 

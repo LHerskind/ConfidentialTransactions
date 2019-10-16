@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: akosba.jsnark:JsnarkCircuitBuilder:1.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/akosba/jsnark/JsnarkCircuitBuilder/1.1/JsnarkCircuitBuilder-1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/akosba/jsnark/JsnarkCircuitBuilder/1.1/JsnarkCircuitBuilder-1.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/akosba/jsnark/JsnarkCircuitBuilder/1.1/JsnarkCircuitBuilder-1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
