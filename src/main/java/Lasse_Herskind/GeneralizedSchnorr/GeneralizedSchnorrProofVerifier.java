@@ -1,8 +1,6 @@
 package Lasse_Herskind.GeneralizedSchnorr;
 
-import Lasse_Herskind.SingleKnowledgeProof.KnowledgeProof;
 import edu.stanford.cs.crypto.efficientct.DoubleGeneratorParams;
-import edu.stanford.cs.crypto.efficientct.GeneratorParams;
 import edu.stanford.cs.crypto.efficientct.VerificationFailedException;
 import edu.stanford.cs.crypto.efficientct.Verifier;
 import edu.stanford.cs.crypto.efficientct.circuit.groups.GroupElement;

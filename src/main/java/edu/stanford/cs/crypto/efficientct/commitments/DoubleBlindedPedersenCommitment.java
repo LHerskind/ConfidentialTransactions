@@ -56,6 +56,11 @@ public class DoubleBlindedPedersenCommitment<T extends GroupElement<T>> implemen
 
     public BigInteger getRandom() {return random; }
 
+    @Override
+    public String toString() {
+        return "Comm(" + this.serial + ", " + this.value +", " + this.random + ") = " + getCommitment().stringRepresentation();
+    }
+
     public T getCommitment() {
         if (commitment == null) {
             commitment = base.commit(serial, value, random);

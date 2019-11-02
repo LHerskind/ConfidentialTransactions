@@ -14,10 +14,11 @@ import edu.stanford.cs.crypto.efficientct.util.ProofUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SpendingExample {
+public class SpendingExample2 {
 
     private static BN128Group curve;
     private static DoubleGeneratorParams params;
@@ -42,8 +43,8 @@ public class SpendingExample {
         long start_time = System.currentTimeMillis();
 
         // First, we need to make an anonymity set, let us use n = 2 and m = 2 for N = 4
-        int n = 4; // Need to make something where we can change this! We should be able to work with other stuff than only binary trees!
-        int m = 6;
+        int n = 2;
+        int m = 2;
         int N = (int) Math.pow(n, m);
         System.out.println("n: " + n + ", m: " + m + ", N: " + N);
         init(N);
@@ -70,14 +71,14 @@ public class SpendingExample {
         for (int i = 0; i < N - 1; i++) {
             CMList.add(getDBPedersen(BigInteger.valueOf(i + 1)));
         }
-        CMList.add(1, coin);
+        CMList.add(2, coin);
         ArrayList<DoubleBlindedPedersenCommitment> CMList_ = new ArrayList<>();
         for (DoubleBlindedPedersenCommitment commit : CMList) {
             CMList_.add(commit.sub(serialNumber));
         }
 
         VectorBase vectorBase = params.getVectorBase();
-        int l = 1;
+        int l = 2;
         l_bin = getNAry(l, n, m);
         BigInteger rA = ProofUtils.randomNumber();
         BigInteger rB = ProofUtils.randomNumber();
@@ -92,35 +93,47 @@ public class SpendingExample {
         GroupElement D = vectorBase.commit(getDVector(n, m), rD);
 
         // Now we need to do some computation on the commitments
-        ArrayList<GroupElement> Gks = new ArrayList<>();
-        ArrayList<GroupElement> Qks = new ArrayList<>();
-        ArrayList<BigInteger> rhok = new ArrayList<>();
-        ArrayList<BigInteger> tauk = new ArrayList<>();
-        ArrayList<BigInteger> gammak = new ArrayList<>();
+        GroupElement[] Gks = new GroupElement[m];
+        GroupElement[] Qks =  new GroupElement[m];
+        BigInteger[] rhok =  new BigInteger[m];
+        BigInteger[] tauk =  new BigInteger[m];
+        BigInteger[] gammak =  new BigInteger[m];
 
-        ArrayList<ArrayList<BigInteger>> Pi_ks = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            Pi_ks.add(calculatePks_i(i, n, m));
+        BigInteger[][] Pi_ks = new BigInteger[N][m];
+
+        Set<Integer> indexes = new HashSet<>();
+        for(int i = 0 ; i < N; i++){
+            indexes.add(i);
         }
 
-        for (int k = 0; k < m; k++) {
+        indexes.parallelStream().forEach((i -> {
+            Pi_ks[i] = calculatePks_i(i, n, m);
+        }));
+
+        Set<Integer> indexesK = new HashSet<>();
+        for(int i = 0 ; i < m; i++){
+            indexesK.add(i);
+        }
+
+        indexesK.parallelStream().forEach(k -> {
             BigInteger rho = ProofUtils.randomNumber();
             BigInteger tau = ProofUtils.randomNumber();
             BigInteger gamma = ProofUtils.randomNumber();
-            rhok.add(rho);
-            tauk.add(tau);
-            gammak.add(gamma);
 
-            GroupElement Gk = CMList_.get(0).getCommitment().multiply(Pi_ks.get(0).get(k));
+            rhok[k] = rho;
+            tauk[k] = tau;
+            gammak[k] = gamma;
+
+            GroupElement Gk = CMList_.get(0).getCommitment().multiply(Pi_ks[0][k]);
             for(int i = 1 ; i < N; i++){
-                Gk = Gk.add(CMList_.get(i).getCommitment().multiply(Pi_ks.get(i).get(k)));
+                Gk = Gk.add(CMList_.get(i).getCommitment().multiply(Pi_ks[i][k]));
             }
             Gk = Gk.add(params.getBase().j.multiply(gamma.negate()));
-            Gks.add(Gk);
+            Gks[k] = Gk;
 
             GroupElement Qk = params.getBase().j.multiply(gamma).add(getDBPedersen(BigInteger.ZERO, rho, tau).getCommitment());
-            Qks.add(Qk);
-        }
+            Qks[k] = Qk;
+        });
 
         // Start of verifier 1
         BigInteger x = ProofUtils.randomNumber();
@@ -140,8 +153,8 @@ public class SpendingExample {
         BigInteger zV = V.multiply(x.pow(m));
         BigInteger zR = R.multiply(x.pow(m));
         for(int k = 0 ; k < m; k++){
-            zV = zV.subtract(rhok.get(k).multiply(x.pow(k)));
-            zR = zR.subtract(tauk.get(k).multiply(x.pow(k)));
+            zV = zV.subtract(rhok[k].multiply(x.pow(k)));
+            zR = zR.subtract(tauk[k].multiply(x.pow(k)));
         }
 
         // Start verifier 2
@@ -194,9 +207,9 @@ public class SpendingExample {
             bigFucker1 = bigFucker1.add(C_i); // and * becomes +
         }
 
-        GroupElement bigFucker2 = Gks.get(0).add(Qks.get(0)).multiply(x.pow(0).negate()); // Could be issues here
+        GroupElement bigFucker2 = Gks[0].add(Qks[0]).multiply(x.pow(0).negate()); // Could be issues here
         for(int k = 1; k < m; k++){
-            GroupElement temp = Gks.get(k).add(Qks.get(k)).multiply(x.pow(k).negate());
+            GroupElement temp = Gks[k].add(Qks[k]).multiply(x.pow(k).negate());
             bigFucker2 = bigFucker2.add(temp);
         }
 
@@ -207,6 +220,23 @@ public class SpendingExample {
         } else {
             System.out.println("BIGBRAIN");
         }
+
+        // The proof of no value creation
+        BigInteger witness_a = R.multiply(x.pow(m));
+        for(int k = 0 ; k < m; k++){
+            witness_a = witness_a.add(gammak[k].multiply(x.pow(k)));
+        }
+        witness_a.mod(curve.groupOrder());
+        System.out.println(witness_a);
+
+        GroupElement public_A = comm;
+        for(int k = 0; k < m; k++){
+            public_A = public_A.add(Qks[k].multiply(x.pow(k)));
+        }
+        public_A = public_A.subtract(getDBPedersen(BigInteger.ZERO, V, BigInteger.ZERO).getCommitment().multiply(x.pow(m)));
+
+        System.out.println(public_A.stringRepresentation());
+        System.out.println(getDBPedersen(BigInteger.ZERO, BigInteger.ZERO, witness_a).getCommitment().stringRepresentation());
 
         System.out.println(System.currentTimeMillis() - start_time);
     }
@@ -240,9 +270,9 @@ public class SpendingExample {
         return Sets.combinations(ImmutableSet.copyOf(to_combine), number_of_sigmas);
     }
 
-    private static ArrayList<BigInteger> calculatePks_i(int i_val, int n, int m) {
+    private static BigInteger[] calculatePks_i(int i_val, int n, int m) {
         int[] i_bin = getNAry(i_val, n, m);
-        ArrayList<BigInteger> ks = new ArrayList<>();
+        BigInteger[] ks = new BigInteger[m];
 
         for (int k = 0; k < m; k++) {
             BigInteger Pi_k = BigInteger.ZERO;
@@ -257,7 +287,7 @@ public class SpendingExample {
                 }
                 Pi_k = Pi_k.add(temp);
             }
-            ks.add(Pi_k);
+            ks[k] = Pi_k;
         }
 
         return ks;
