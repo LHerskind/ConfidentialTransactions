@@ -18,4 +18,13 @@ public class GeneralizedSchnorrProofVerifier <T extends GroupElement<T>> impleme
             throw new VerificationFailedException();
         }
     }
+
+    public void verifyNoS(DoubleGeneratorParams<T> params, T commitment, GeneralizedSchnorrProof<T> proof) throws VerificationFailedException {
+        BigInteger challenge = ProofUtils.computeChallenge(params.getGroup().groupOrder(), commitment, proof.getT());
+        T verificationPoint = proof.getA().multiply(challenge).add(proof.getT());
+
+        if(!verificationPoint.equals(proof.getS())){
+            throw new VerificationFailedException();
+        }
+    }
 }

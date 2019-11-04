@@ -33,6 +33,29 @@ public class GeneralizedSchnorrProofProver<T extends GroupElement<T>> implements
         return new GeneralizedSchnorrProof<>(A, T, S);
     }
 
+    public GeneralizedSchnorrProof<T> generateProofNoS(DoubleGeneratorParams<T> parameter, T commitment, DoubleBlindedPedersenCommitment<T> witness) {
+        // Notation in this implementation is a bit different from the paper. y -> A. u -> T
+        T A = witness.getCommitment();
+
+        if(!commitment.equals(A)){
+            return null;
+        }
+
+        BigInteger s0 = ProofUtils.randomNumber();
+        BigInteger t0 = ProofUtils.randomNumber();
+
+        T T = parameter.getBase().commit(BigInteger.ZERO, s0, t0);
+
+        BigInteger challenge = ProofUtils.computeChallenge(parameter.getGroup().groupOrder(), commitment, T);
+
+        BigInteger s1 = s0.add(witness.getValue().multiply(challenge));
+        BigInteger t1 = t0.add(witness.getRandom().multiply(challenge));
+
+        T S = parameter.getBase().commit(BigInteger.ZERO, s1 ,t1);
+
+        return new GeneralizedSchnorrProof<>(A, T, S);
+    }
+
 
 
 }
