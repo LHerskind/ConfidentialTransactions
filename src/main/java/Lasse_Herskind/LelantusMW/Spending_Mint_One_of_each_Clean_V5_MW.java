@@ -5,6 +5,10 @@ import Lasse_Herskind.GeneralizedSchnorr.GeneralizedSchnorrProofProver;
 import Lasse_Herskind.GeneralizedSchnorr.GeneralizedSchnorrProofVerifier;
 import Lasse_Herskind.LelantusConstants;
 import Lasse_Herskind.LelantusUtils;
+import Lasse_Herskind.OneOutOfMany.OneOutOfManyProof;
+import Lasse_Herskind.OneOutOfMany.OneOutOfManyProofProver;
+import Lasse_Herskind.OneOutOfMany.OneOutOfManyProofVerifier;
+import Lasse_Herskind.OneOutOfMany.OneOutOfManyWitness;
 import Lasse_Herskind.OneOutOfManyMW.OneOutOfManyProofMW;
 import Lasse_Herskind.OneOutOfManyMW.OneOutOfManyProofProverMW;
 import Lasse_Herskind.OneOutOfManyMW.OneOutOfManyProofVerifierMW;
@@ -18,7 +22,12 @@ import edu.stanford.cs.crypto.efficientct.util.ProofUtils;
 
 import java.math.BigInteger;
 
-public class Spending_Mint_One_of_each_Clean_V4_MW {
+/**
+ * This is a joinsplit where we try to use a NORMAL one-out-of-many proof, and then instead pass the outputs,
+ * ONLY afterwards, to ensure that no value was created.
+ */
+
+public class Spending_Mint_One_of_each_Clean_V5_MW {
 
     private static BN128Group curve;
     private static DoubleGeneratorParams params;
@@ -63,7 +72,7 @@ public class Spending_Mint_One_of_each_Clean_V4_MW {
 
         System.out.println("Reveal S: " + S);
 
-        DoubleBlindedPedersenCommitment serialNumber = LelantusUtils.getDBPedersen(params, S, BigInteger.ZERO, BigInteger.ZERO).add(output_coin);
+        DoubleBlindedPedersenCommitment serialNumber = LelantusUtils.getDBPedersen(params, S, BigInteger.ZERO, BigInteger.ZERO); // .add(output_coin);
         System.out.println("Serial Number Point: " + serialNumber.getCommitment().stringRepresentation());
 
         // TODO: Implement the 1-out-of-N proofs below!
@@ -77,15 +86,31 @@ public class Spending_Mint_One_of_each_Clean_V4_MW {
             CMList[i] = CMList[i].subtract(serialNumber.getCommitment());
         }
 
-        OneOutOfManyProofProverMW oneOutOfManyProofProverMW = new OneOutOfManyProofProverMW();
-        OneOutOfManyProofVerifierMW oneOutOfManyProofVerifierMW = new OneOutOfManyProofVerifierMW();
+        OneOutOfManyProofProver oneOutOfManyProofProver = new OneOutOfManyProofProver();
+        OneOutOfManyProofVerifier oneOutOfManyProofVerifier = new OneOutOfManyProofVerifier();
 
-        OneOutOfManyWitnessMW oneOutOfManyWitnessMW = new OneOutOfManyWitnessMW(N - 1, shielded_coin, output_coin);
-        OneOutOfManyProofMW oneOutOfManyProofMW = oneOutOfManyProofProverMW.generateProof(params, CMList, oneOutOfManyWitnessMW);
-        oneOutOfManyProofVerifierMW.verify(params, CMList, oneOutOfManyProofMW);
+        OneOutOfManyWitness oneOutOfManyWitness = new OneOutOfManyWitness(N - 1, shielded_coin);
+        OneOutOfManyProof oneOutOfManyProof = oneOutOfManyProofProver.generateProof(params, CMList, oneOutOfManyWitness);
+        oneOutOfManyProofVerifier.verify(params, CMList, oneOutOfManyProof);
 
-        BigInteger private_A = LelantusUtils.getAPrivate(params, oneOutOfManyProofMW, oneOutOfManyWitnessMW);
-        GroupElement public_A = LelantusUtils.getAPublic(params, oneOutOfManyProofMW);
+        // Can we make the A, but here just as a double-blinded so we can extract the other when we need it.
+        BigInteger private_A = LelantusUtils.getAPrivate(params, oneOutOfManyProof, oneOutOfManyWitness);
+        GroupElement public_A = LelantusUtils.getAPublic(params, oneOutOfManyProof);
+        // Then we actually make some change to
+        BigInteger x = LelantusUtils.getChallenge(params, oneOutOfManyProof);
+        System.out.println("Just V: " + params.getBase().h.multiply(V.multiply(x.pow(m))));
+        System.out.println("The output: " + output_coin);
+
+        System.out.println(params.getBase().h.multiply(output_coin.times(x.pow(m)).getValue()));
+        public_A = output_coin.times(x.pow(m)).getCommitment().subtract(public_A);
+
+        BigInteger offset_from_output_coin = output_coin.getRandom().multiply(x.pow(m));
+        private_A = offset_from_output_coin.subtract(private_A);
+
+        System.out.println(public_A);
+        System.out.println(params.getBase().j.multiply(private_A));
+
+        System.out.println("Did we come all the way down here!?");
 
         if (!public_A.equals(LelantusUtils.getDBPedersen(params, BigInteger.ZERO, BigInteger.ZERO, private_A).getCommitment())) {
             throw new VerificationFailedException();

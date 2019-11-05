@@ -53,6 +53,29 @@ public class LelantusUtils<T extends GroupElement<T>> {
         return public_A;
     }
 
+    public static GroupElement getAPublic(DoubleGeneratorParams params, OneOutOfManyProof... proofs) {
+        int m = LelantusConstants.m;
+
+        GroupElement[] Qks = proofs[0].getQks();
+        BigInteger x = getChallenge(params, proofs[0]);
+        GroupElement public_A = getDBPedersen(params, BigInteger.ZERO, proofs[0].getzV(), proofs[0].getzR()).getCommitment();
+        for (int k = 0; k < m; k++) {
+            public_A = public_A.add(Qks[k].multiply(x.pow(k)));
+        }
+
+        for (int i = 1; i < proofs.length; i++) {
+            Qks = proofs[i].getQks();
+            x = getChallenge(params, proofs[i]);
+            GroupElement public_A_Temp = getDBPedersen(params, BigInteger.ZERO, proofs[i].getzV(), proofs[i].getzR()).getCommitment();
+            for (int k = 0; k < m; k++) {
+                public_A_Temp = public_A_Temp.add(Qks[k].multiply(x.pow(k)));
+            }
+            public_A = public_A.add(public_A_Temp);
+        }
+
+        return public_A;
+    }
+
     public static BigInteger getAPrivate(DoubleGeneratorParams params, OneOutOfManyProof proof, OneOutOfManyWitness witness) {
         int m = LelantusConstants.m;
 
@@ -135,7 +158,7 @@ public class LelantusUtils<T extends GroupElement<T>> {
         for (int k = 0; k < m; k++) {
             witness_a = witness_a.add(gammak[k].multiply(x.pow(k)));
         }
-        witness_a.mod(params.getGroup().groupOrder());
+        witness_a = witness_a.mod(params.getGroup().groupOrder());
         return witness_a;
     }
 
