@@ -1,5 +1,8 @@
+# Confidential and Anonymous transfers.
 
-# Confidential transfers on Ethereum - the *bulletcoin*
+This repository is two-fold, it contains an implementation of confidential transfers on Ethereum (*bulletcoin*), as well as an implementation of the One-Out-Of-Many proofs of Lelantus, showcasing how these can be used with MimbleWimble. 
+
+## Confidential transfers on Ethereum - the *bulletcoin*
 
 This repository is the implementation of publicly verifiable confidential transfers on the Ethereum blockchain, as proposed in the BitFlow Paper[3].
 
@@ -9,7 +12,6 @@ The implementation heavily depends upon homomorphic commitments:
 ```
 commitment(a+b, lambda_1+lambda_2) = commitment(a, lambda_1) + commitment(b, lambda_2)
 ```
-
 
 To enable confidential transfers, we shall follow a rather short transfer protocol. 
 This protocol will split public transfers into a *sending* and *receiving* part.
@@ -26,11 +28,11 @@ This protocol will split public transfers into a *sending* and *receiving* part.
 To prove that commitments are to non-negative values, we use the `Bulletproofs`[1]. 
 More simple zero knowledge proofs will be used to proof knowledge of value x.
 
-## How to use
+### How to use
 To use the *bulletcoin* one have to provide a large set of arguments when initializing the *contracts*. 
 To generate those arguments, goto the "Setup of *bulletcoin*".
 
-### Setup the *bulletcoin*
+#### Setup the *bulletcoin*
 Go to `Main_Testing.java` set `setupPhaes = true;`. When run, the output will be similar to:
 ```
 Bitlength: 4
@@ -44,7 +46,7 @@ Ethereum input, rangeProofVerifier:
 ```
 The ouputs provided, will be the list of arguments for initialization of the *contracts*. *"ipVerifier"* is contract of the *efficientInnerProductVerifier*.
 
-### Testing the coin
+#### Testing the coin
 An example of a possible usage of the coin, is made in `mint_then_transfer_and_receive` and will follow the flow:
 * Init 2 users and their lambda.
 * Mint 5 coins to *user1*
@@ -69,6 +71,11 @@ This is again just the arguments needed for the methods. Running the *minting* w
 bulletCoin.mint(<address_of_user_1>, "0x22f0d6ec48adf22874a831a34703b8cc37b90a8f0de7ad79bc53b45c0cf12fcb","0x2edb129868ec0833acbcf522e6528f826228265a4bad09f9965900271296ded5",{from:<owner_of_coin>});
 ```
 
+## Oscausi - MimbleWimble and Lelantus (WIP)
+*This section is to be expanded. Maybe move Lelantus to another repository*
+
+
+## References
 [1]: https://crypto.stanford.edu/bulletproofs/
 [2]: https://github.com/BANKEX/ETHDenver_ConfidentialTransactions
 [3]: https://findit.dtu.dk/en/catalog/2434703292 
