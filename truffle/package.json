@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/BANKEX/ETHDenver_ConfidentialTransactions#readme",
   "dependencies": {
-    "truffle": "^4.0.6",
+    "truffle": "^4.1.17",
     "zeppelin-solidity": "1.6.0"
   },
   "devDependencies": {
